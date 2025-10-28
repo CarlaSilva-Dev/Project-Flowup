@@ -1,0 +1,45 @@
+<body>
+    <h1>Lista de Tarefas</h1>
+
+    <!-- Link para criar nova tarefa -->
+    <p>
+        <a href="{% url 'criar_tarefa' %}">➕ Criar Nova Tarefa</a>
+    </p>
+
+    {% if tarefas %}
+        <ul>
+            {% for tarefa in tarefas %}
+                <li>
+                    <!-- Status da tarefa com cor dinâmica -->
+                    <span style="color: {{ tarefa.cor_status }};">
+                        {% if tarefa.status == "completo" %}
+                            [CONCLUÍDA]
+                        {% else %}
+                            [PENDENTE]
+                        {% endif %}
+                    </span>
+
+                    <!-- Título da tarefa com link para gerenciar -->
+                    <a href="{% url 'gerenciar_tarefa' pk=tarefa.pk %}">
+                        <strong>{{ tarefa.titulo }}</strong>
+                    </a>
+
+                    <!-- Botão para alternar status -->
+                    <form method="POST" style="display: inline;" action="{% url 'gerenciar_tarefa' pk=tarefa.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="alternar_status" value="true">
+                        <button type="submit">
+                            {% if tarefa.status == "completo" %}
+                                Marcar como Pendente
+                            {% else %}
+                                Marcar como Completo
+                            {% endif %}
+                        </button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nenhuma tarefa encontrada.</p>
+    {% endif %}
+</body>
