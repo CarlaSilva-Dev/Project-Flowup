@@ -1,10 +1,9 @@
-# tasks/urls.py
-
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.listar_tarefas, name='lista_tarefas'), 
-    path('nova/', views.criar_tarefa, name='criar_tarefa'),
-    path('<int:pk>/', views.gerenciar_tarefa, name='gerenciar_tarefa'),
+    path('', views.inicio, name='inicio'),
+    path('tarefas/', views.tarefas, name='tarefas'),
+    path('add/', views.add_tarefa, name='add_tarefa'),
+    path('delete/<int:id>/', views.delete_tarefa, name='delete_tarefa'),
 ]

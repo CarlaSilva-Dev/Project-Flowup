@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestão de Tarefas</title>
+  <style>
+    body { font-family: Arial; background: #f8f8ff; padding: 30px; }
+    .container { max-width: 500px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
+    .tarefa { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+    button { background: #6a5acd; color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Gestão de Tarefas</h1>
+
+    <!-- Formulário -->
+    <form id="form-tarefa">
+      <input type="text" id="titulo" placeholder="Adicionar nova tarefa..." required>
+      <button type="submit">Adicionar</button>
+    </form>
+
+    <hr>
+
+    <!-- Lista -->
+    <div id="lista">
+      {% for tarefa in tarefas %}
+        <div class="tarefa" data-id="{{ tarefa.id }}">
+          <span>{{ tarefa.titulo }}</span>
+          <div>
+            <button class="concluir">✓</button>
+            <button class="excluir">🗑️</button>
+          </div>
+        </div>
+      {% empty %}
+        <p>Nenhuma tarefa adicionada ainda.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script>
+    // Adicionar tarefa (via AJAX)
+    document.getElementById("form-tarefa").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const titulo = document.getElementById("titulo").value;
+      const res = await fetch("/add/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+        body: JSON.stringify({ titulo })
+      });
+      if (res.ok) location.reload();
+    });
+
+    // Excluir tarefa
+    document.querySelectorAll(".excluir").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.closest(".tarefa").dataset.id;
+        const res = await fetch(`/delete/${id}/`);
+        if (res.ok) location.reload();
+      });
+    });
+  </script>
+</body>
+</html>
