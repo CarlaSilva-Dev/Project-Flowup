@@ -22,18 +22,20 @@
       background-color: #fff;
       font-weight: 500;
     }
+
     .navbar h3 {
       background: linear-gradient(135deg, #8b5cf6, #6366f1);
       margin-left: 20px;
       font-weight: 700;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-
     }
+
     .btn-outline-info {
       border-color: #6A5ACD;
       color: #6A5ACD;
     }
+
     .btn-outline-info:hover {
       background-color: #6A5ACD;
       color: #fff;
@@ -46,9 +48,10 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      min-height: 100vh;
-      margin-top: -150px; 
+      min-height: 80vh;
+      margin-top: -100px;
     }
+
     h2 {
       background: linear-gradient(135deg, #8b5cf6, #6366f1);
       font-size: 2.8rem;
@@ -57,38 +60,113 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
     h4 {
-      color: #6c757d;
+      color: #a3a7acff;
       font-size: 1.2rem;
       margin-bottom: 30px;
     }
 
     /* BOTÃO CENTRAL */
     .btn-gradient {
+      font-size: 1.3rem;
       background: linear-gradient(135deg, #8b5cf6, #6366f1);
       border: none;
+      margin-top: 35px;
       color: #fff;
       font-weight: 600;
-      padding: 10px 24px;
-      border-radius: 8px;
+      padding: 20px 26px;
+      border-radius: 9px;
       transition: 0.3s;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
+
     .btn-gradient:hover {
       opacity: 0.9;
       transform: scale(1.03);
     }
 
+    /* CARDS CENTRAIS */
+    .cards-centrais {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 50px; /* distância entre cards */
+      margin-bottom: 80px;
+      margin-top: -100px;
+    }
+
+    .card1, .card2, .card3 {
+      width: 18rem;
+      padding: 20px;
+      border-radius: 12px;
+      transition: 0.3s;
+      border: none;
+      background: #fff;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .card1:hover, .card2:hover, .card3:hover {
+      transform: scale(1.05);
+      box-shadow: 0px 6px 16px rgba(0,0,0,0.12);
+    }
+
+    .card1 i, .card2 i, .card3 i {
+      font-size: 3rem;
+      color: #6A5ACD;
+      margin-bottom: 15px;
+    }
+
+    .card-title {
+      font-weight: 600;
+      color: #202020ff;
+    }
+
+    .card-text {
+      color: #555;
+    }
+
     /* RESPONSIVIDADE */
+    @media (max-width: 900px) {
+      .cards-centrais {
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+    }
+
     @media (max-width: 768px) {
       h2 { font-size: 2rem; }
       h4 { font-size: 1rem; }
       .btn-gradient { font-size: 0.9rem; }
     }
+
+    /* FOOTER 100% DA TELA */
+    .footer-flowup {
+      width: 100%;
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      padding: 45px 20px;
+      color: #fff;
+      text-align: center;
+      margin-top: 60px;
+      border-radius: 5px 5px 0 0;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .footer-flowup h5 {
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .footer-flowup p {
+      margin: 0;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
   </style>
 </head>
 
 <body>
+
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top shadow-sm">
     <h3>FlowUp</h3>
@@ -97,6 +175,7 @@
         <button class="btn btn-outline-info me-2" type="button">
           <i class="bi bi-house-door me-1"></i> Início
         </button>
+
         <button class="btn btn-outline-info me-5" type="button" onclick="window.location.href='{% url 'tarefas' %}'">
           <i class="bi bi-check2-square me-1"></i> Tarefas
         </button>
@@ -104,25 +183,48 @@
     </form>
   </nav>
 
+
   <!-- Conteúdo Central -->
   <div class="texto_inicio">
     <h2>Organize suas Tarefas</h2>
     <h4>O sistema de gestão de tarefas mais simples e eficiente para aumentar sua produtividade</h4>
+
     <a href="{% url 'tarefas' %}" class="btn btn-gradient">
       <i class="bi bi-check2-circle me-2"></i> Ir para Tarefas
     </a>
   </div>
 
-  <!--Cards Centrais-->
-<div class="card" style="width: 18rem;">
-  <div class="card-body">
-    <h5 class="card-title">Card title</h5>
-    <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+  <!-- CARDS CENTRAIS -->
+  <div class="cards-centrais">
+
+    <div class="card1 text-center">
+      <i class="bi bi-list-check"></i>
+      <h5 class="card-title">Gestão Simples</h5>
+      <p class="card-text">Adicione, complete e organize suas tarefas facilmente</p>
+    </div>
+
+    <div class="card2 text-center">
+      <i class="bi bi-calendar-event"></i>
+      <h5 class="card-title">Agenda</h5>
+      <p class="card-text">Gerencie compromissos e datas importantes</p>
+    </div>
+
+    <div class="card3 text-center">
+      <i class="bi bi-bar-chart-line"></i>
+      <h5 class="card-title">Interface Rápida</h5>
+      <p class="card-text">Visualize suas tarefas com fluidez e praticidade</p>
+    </div>
 
   </div>
-</div>
+
+  <!-- FOOTER 100% -->
+  <footer class="footer-flowup">
+    <h5>FlowUp © 2025</h5>
+    <p>Organizando suas tarefas com simplicidade e eficiência</p>
+  </footer>
+
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
