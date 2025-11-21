@@ -2,22 +2,111 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gestão de Tarefas</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
   <style>
-    body { font-family: Arial; background: #f8f8ff; padding: 30px; }
-    .container { max-width: 500px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
-    .tarefa { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+    body { font-family: Arial; background: #f8f8ff; padding: 30px; padding-top: 90px; }
+    .container { max-width: 700px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
+
+    /* NAVBAR styles (from inicio) */
+    .navbar-custom {
+      background-color: #fff;
+      font-weight: 500;
+    }
+    .navbar-custom h3 {
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      margin-left: 10px;
+      font-weight: 700;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .btn-outline-info {
+      border-color: #6A5ACD;
+      color: #6A5ACD;
+    }
+    .btn-outline-info:hover {
+      background-color: #6A5ACD;
+      color: #fff;
+    }
+    .btn-tarefas {
+      background: #6A5ACD;
+      color: #fff;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      margin-right: 20px;
+    }
+    .btn-tarefas:hover { background: #5746b0; color: #fff; }
+    /* give navbar inner container a small right padding so the right-side button sits slightly left from the edge */
+    .navbar-custom .container-fluid { padding-right: 20px; }
+
+    /* task styles */
+    .tarefa { display:flex; justify-content:space-between; align-items:center; padding:12px; margin:8px 0; border-radius:8px; background:#fff; border-left:4px solid transparent; }
+    .tarefa:hover { box-shadow:0 6px 18px rgba(0,0,0,0.06); transform:translateY(-2px); }
+    .tarefa.concluida { border-left-color: #28a745; background:#f6fff6; }
+    .tarefa-info { cursor:pointer; display:flex; align-items:center; gap:10px; }
+    .tarefa-info span.title { font-weight:700; color:#222; }
+    .status-badge { font-size:0.8em; padding:4px 8px; border-radius:999px; color:white; background:#6c757d; }
+    .status-badge.done { background: #28a745; }
+    .status-badge.pending { background: #ff9800; }
     button { background: #6a5acd; color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; }
+
+    h1{
+    color: #8b5cf6;
+    font-weight: 700;
+    }
+
+    #titulo {
+      border: 2px solid #6A5ACD;
+      border-radius: 10px;
+      padding: 10px 15px;
+    }
+    #titulo:focus {
+      outline: none;
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.1);
+    }
+    #descricao {
+      border: 2px solid #6A5ACD;
+      border-radius: 10px;
+      padding: 10px 15px;
+    }
+    #descricao:focus {
+      outline: none;
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.1);
+    }
   </style>
 </head>
 <body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top shadow-sm">
+    <div class="container-fluid">
+      <button class="btn btn-outline-info" type="button" onclick="window.location.href='{% url 'inicio' %}'">
+        <i class="bi bi-arrow-left me-1"></i> Voltar
+      </button>
+      <div class="ms-auto">
+        <button class="btn btn-tarefas" type="button" onclick="window.location.href='{% url 'tarefas' %}'">
+          <i class="bi bi-check2-square me-1"></i> Tarefas
+        </button>
+      </div>
+    </div>
+  </nav>
+
   <div class="container">
-    <h1>Gestão de Tarefas</h1>
+    <h1>Minhas Tarefas</h1>
 
     <!-- Formulário -->
     <form id="form-tarefa">
       <input type="text" id="titulo" placeholder="Adicionar nova tarefa..." required>
-      <button type="submit">Adicionar</button>
+      <textarea id="descricao" placeholder="Descrição (opcional)..." style="width:100%; margin-top:8px; padding:8px; border-radius:6px; border:1px solid #ddd;"></textarea>
+      <button type="submit" style="margin-top:8px;">Adicionar</button>
     </form>
 
     <hr>
@@ -25,11 +114,29 @@
     <!-- Lista -->
     <div id="lista">
       {% for tarefa in tarefas %}
-        <div class="tarefa" data-id="{{ tarefa.id }}">
-          <span>{{ tarefa.titulo }}</span>
+        <div class="tarefa {% if tarefa.concluida %}concluida{% endif %}" data-id="{{ tarefa.id }}">
+          <div class="tarefa-info" onclick="openEditModal({{ tarefa.id }}, '{{ tarefa.titulo|escapejs }}', '{{ tarefa.descricao|escapejs }}', {{ tarefa.concluida|yesno:"true,false" }})">
+            <div>
+              <span class="title">{{ tarefa.titulo }}</span>
+              {% if tarefa.descricao %}
+                <small style="display:block; color:#666; margin-top:4px;">{{ tarefa.descricao|truncatewords:10 }}</small>
+              {% endif %}
+            </div>
+            <div>
+              {% if tarefa.concluida %}
+                <span class="status-badge done">Concluída</span>
+              {% else %}
+                <span class="status-badge pending">Pendente</span>
+              {% endif %}
+            </div>
+          </div>
           <div>
-            <button class="concluir">✓</button>
-            <button class="excluir">🗑️</button>
+            {% if tarefa.concluida %}
+              <button class="concluir" title="Marcar como pendente"><i class="bi bi-arrow-counterclockwise"></i></button>
+            {% else %}
+              <button class="concluir" title="Marcar como concluída"><i class="bi bi-check-lg"></i></button>
+            {% endif %}
+            <button class="excluir" title="Excluir tarefa"><i class="bi bi-trash3"></i></button>
           </div>
         </div>
       {% empty %}
@@ -39,26 +146,136 @@
   </div>
 
   <script>
+    // Read CSRF token from cookie (Django sets csrftoken cookie)
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
     // Adicionar tarefa (via AJAX)
     document.getElementById("form-tarefa").addEventListener("submit", async (e) => {
       e.preventDefault();
       const titulo = document.getElementById("titulo").value;
-      const res = await fetch("/add/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-        body: JSON.stringify({ titulo })
-      });
-      if (res.ok) location.reload();
+      const descricao = document.getElementById("descricao") ? document.getElementById("descricao").value : '';
+
+      try {
+        const res = await fetch("/add/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-CSRFToken": csrftoken },
+          body: JSON.stringify({ titulo, descricao })
+        });
+        if (res.ok) {
+          location.reload();
+        } else {
+          alert('Erro ao adicionar tarefa');
+        }
+      } catch (err) {
+        alert('Erro de conexão');
+      }
     });
 
-    // Excluir tarefa
-    document.querySelectorAll(".excluir").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const id = btn.closest(".tarefa").dataset.id;
-        const res = await fetch(`/delete/${id}/`);
-        if (res.ok) location.reload();
+    function initTaskButtons() {
+      // Toggle concluir
+      document.querySelectorAll('.concluir').forEach(btn => {
+        btn.removeEventListener && btn.removeEventListener('click', () => {});
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const id = btn.closest('.tarefa').dataset.id;
+          try {
+            const res = await fetch(`/toggle/${id}/`, {
+              method: 'POST',
+              headers: { 'X-CSRFToken': csrftoken }
+            });
+            if (res.ok) location.reload();
+            else alert('Erro ao marcar tarefa');
+          } catch (err) { alert('Erro de conexão'); }
+        });
       });
+
+      // Excluir tarefa
+      document.querySelectorAll('.excluir').forEach(btn => {
+        btn.removeEventListener && btn.removeEventListener('click', () => {});
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const id = btn.closest('.tarefa').dataset.id;
+          if (!confirm('Tem certeza que deseja deletar esta tarefa?')) return;
+          try {
+            const res = await fetch(`/delete/${id}/`, {
+              method: 'DELETE',
+              headers: { 'X-CSRFToken': csrftoken }
+            });
+            if (res.ok) location.reload();
+            else alert('Erro ao deletar tarefa');
+          } catch (err) { alert('Erro de conexão'); }
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initTaskButtons();
     });
   </script>
+
+  <!-- Modal de edição -->
+  <div id="modal-edit" style="display:none; position:fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:1000;"> 
+    <div style="background:#fff; padding:20px; border-radius:8px; max-width:480px; width:90%; margin:40px auto;">
+      <h3 id="modal-title">Editar Tarefa</h3>
+      <input type="hidden" id="edit-id">
+      <div style="margin-bottom:8px;"><input id="edit-titulo" placeholder="Título" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;"></div>
+      <div style="margin-bottom:8px;"><textarea id="edit-descricao" placeholder="Descrição" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px; min-height:80px;"></textarea></div>
+      <div style="margin-bottom:12px; display:flex; align-items:center; gap:8px;"><input type="checkbox" id="edit-concluida"><label for="edit-concluida">Concluída</label></div>
+      <div style="text-align:right; display:flex; gap:8px; justify-content:flex-end;"><button onclick="closeEditModal()" style="background:#6c757d; color:white; border:none; padding:8px 12px; border-radius:6px;">Cancelar</button><button onclick="saveEdit()" style="background:#28a745; color:white; border:none; padding:8px 12px; border-radius:6px;">Salvar</button></div>
+    </div>
+  </div>
+
+  <script>
+    function openEditModal(id, titulo, descricao, concluida) {
+      document.getElementById('edit-id').value = id;
+      document.getElementById('edit-titulo').value = titulo || '';
+      document.getElementById('edit-descricao').value = descricao || '';
+      document.getElementById('edit-concluida').checked = (concluida === true || String(concluida) === 'true');
+      document.getElementById('modal-edit').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('modal-edit').style.display = 'none';
+    }
+
+    async function saveEdit() {
+      const id = document.getElementById('edit-id').value;
+      const titulo = document.getElementById('edit-titulo').value.trim();
+      const descricao = document.getElementById('edit-descricao').value.trim();
+      const concluida = document.getElementById('edit-concluida').checked;
+
+      if (!titulo) { alert('O título não pode ficar vazio'); return; }
+
+      try {
+        const res = await fetch(`/update/${id}/`, {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json', 'X-CSRFToken': csrftoken },
+          body: JSON.stringify({ titulo, descricao, concluida })
+        });
+        if (res.ok) {
+          closeEditModal();
+          location.reload();
+        } else {
+          alert('Erro ao salvar alterações');
+        }
+      } catch (err) { alert('Erro de conexão'); }
+    }
+  </script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

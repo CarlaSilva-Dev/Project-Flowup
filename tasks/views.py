@@ -1,6 +1,5 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from .models import Tarefa
 import json
 
@@ -26,7 +25,6 @@ def tarefas(request):
 
 
 # CRIAR (CREATE) - Adicionar tarefa
-@csrf_exempt
 def add_tarefa(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -43,10 +41,10 @@ def add_tarefa(request):
                 'concluida': tarefa.concluida
             }
         })
+    return JsonResponse({'error': 'Método não permitido'}, status=405)
 
 
 # ATUALIZAR (UPDATE) - Editar tarefa
-@csrf_exempt
 def update_tarefa(request, id):
     if request.method == 'POST':
         tarefa = get_object_or_404(Tarefa, id=id)
@@ -67,10 +65,10 @@ def update_tarefa(request, id):
                 'concluida': tarefa.concluida
             }
         })
+    return JsonResponse({'error': 'Método não permitido'}, status=405)
 
 
 # Toggle conclusão da tarefa
-@csrf_exempt
 def toggle_tarefa(request, id):
     if request.method == 'POST':
         tarefa = get_object_or_404(Tarefa, id=id)
@@ -80,12 +78,13 @@ def toggle_tarefa(request, id):
             'status': 'ok',
             'concluida': tarefa.concluida
         })
+    return JsonResponse({'error': 'Método não permitido'}, status=405)
 
 
 # DELETAR (DELETE) - Excluir tarefa
-@csrf_exempt
 def delete_tarefa(request, id):
     if request.method == 'DELETE' or request.method == 'POST':
         tarefa = get_object_or_404(Tarefa, id=id)
         tarefa.delete()
         return JsonResponse({'status': 'ok'})
+    return JsonResponse({'error': 'Método não permitido'}, status=405)
